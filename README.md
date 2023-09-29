@@ -91,7 +91,7 @@ export function mergeDiff(before: any, after: any) {
 VOICEVOX 起動中に下記コマンドを打つとターミナル上にオブジェクトが表示されます(マージ前の変更後のデータとマージ済みのデータ)
 
 ```
-deno run -A main.ts
+deno run -A playground.ts
 ```
 
 ## test
