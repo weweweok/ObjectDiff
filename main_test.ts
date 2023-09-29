@@ -12,7 +12,6 @@ function getMoraText(AccentPhrases: any) {
   });
   return target;
 }
-
 // moraの文字がafterAccentsとmergeDiffで一致し、なおかつafterAccentsとmergeDiffのオブジェクトが一致していないと正しい
 Deno.test(
   "追加操作 (マージされたテストが正確に変更されているか検証しない)",
@@ -24,20 +23,20 @@ Deno.test(
       "こんにちは、こんばんは、おはようございます"
     );
 
-    const aftermoras = pluck(JSON.parse(JSON.stringify(afterAccents)), "moras");
+    const afterMoras = pluck(JSON.parse(JSON.stringify(afterAccents)), "moras");
 
     const mergeAccent = mergeDiff(beforeAccents, afterAccents);
-    const mergemoras = pluck(JSON.parse(JSON.stringify(mergeAccent)), "moras");
+    const mergeMoras = pluck(JSON.parse(JSON.stringify(mergeAccent)), "moras");
 
-    const morastext = getMoraText(aftermoras).join("");
-    const mergemorastext = getMoraText(mergemoras).join("");
+    const morasText = getMoraText(afterMoras).join("");
+    const mergeMorasText = getMoraText(mergeMoras).join("");
 
-    if (morastext === mergemorastext)
+    if (morasText === mergeMorasText)
       assertNotEquals(
         mergeAccent,
         afterAccents,
         "もし、文字列が変わっていない場合、このテストはエラーになります"
       );
-    else console.error(morastext, mergemorastext);
+    else console.error(morasText, mergeMorasText);
   }
 );
