@@ -1,6 +1,6 @@
 # ObjectDiff
 
-VOICEVOX のアクセントデータを良い感じにマージする発見法的ライブラリ
+VOICEVOX のアクセントデータを良い感じにマージする発見法的プログラム
 
 ## Edit lib
 
