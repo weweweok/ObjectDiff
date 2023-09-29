@@ -5,7 +5,7 @@ VOICEVOX のアクセントデータを良い感じにマージする発見法�
 ## Edit lib
 
 main.ts に mergeDiff 関数があります。この関数の中身を編集してより良い結果を返すようにしています。
-([just-diff](https://anguscroll.com/just/just-diff)のインストールが必要です)
+([just-diff](https://anguscroll.com/just/just-diff)を使用しています)
 
 ```
 /*
