@@ -17,9 +17,9 @@ export function mergeDiff(before: any, after: any) {
   console.log("not be MERGED", after);
   const diffed = diff(before, after);
 
-  const diffREpacedFromAfter = diff(after, before).filter((v) => {
-    return v.op === "add";
-  });
+  const diffRepacedFromAfter = diff(after, before).filter(
+    (v) => v.op === "add"
+  );
 
   const diffReplacedFromBefore = diffed.filter(
     (v) => v["op"] === "replace" && v["path"].includes("text")
@@ -30,7 +30,7 @@ export function mergeDiff(before: any, after: any) {
   // 変更操作(挿入かつ削除)
   /*同じ文字で過去のデータが現在のデータに上書きされないようにしたい*/
   for (const beforevalue of diffReplacedFromBefore) {
-    for (const aftervalue of diffREpacedFromAfter) {
+    for (const aftervalue of diffRepacedFromAfter) {
       // 過去の変更内容のtextと今変更された内容が等しくなく、現在の変更と一致する場合、採用する
       if (
         before[Number(beforevalue.path[0])][beforevalue.path[1]][
