@@ -1,6 +1,8 @@
 import { diff } from "https://esm.sh/just-diff@6.0.2";
 import ky from "https://esm.sh/ky";
-
+/**
+ *VOICEVOX_ENGINEからアクセントデータを取得する関数
+ */
 export function getAccentPhrases(str: string) {
   const pushed = `http://localhost:50021/accent_phrases?text=${str}&speaker=1`;
   return ky
