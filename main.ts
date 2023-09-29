@@ -9,28 +9,29 @@ export function getAccentPhrases(str: string) {
     .catch((res) => console.error("VOICEVOXの起動が必須です"));
 }
 
-const beforeAccents = await getAccentPhrases("こんばんは");
-
-const afterAccents = await getAccentPhrases("こんにちは");
 /*
  *オブジェクトの追加、変更、削除をマージする関数
  * path[index],path[index+1]と順番にたどることで変更箇所に到達可能
  * こんにちは -> あに ではうごかない
  */
 export function mergeDiff(before: any, after: any) {
-  console.log("not be MERGED", after);
   const diffed = diff(before, after);
 
   const diffRepacedFromAfter = diff(after, before).filter(
     (v) => v.op === "add"
   );
-
   const diffReplacedFromBefore = diffed.filter(
     (v) => v["op"] === "replace" && v["path"].includes("text")
   );
   const diffadded = diffed.filter((v) => v["op"] === "add");
   const diffremoved = diffed.filter((v) => v["op"] === "remove");
 
+  console.log("======= replace operation ========");
+  console.table(diffReplacedFromBefore);
+  console.log("======= add operation ========");
+  console.table(diffadded);
+  console.log("======= remove operation ========");
+  console.table(diffremoved);
   // 変更操作(挿入かつ削除)
   /*同じ文字で過去のデータが現在のデータに上書きされないようにしたい*/
   for (const beforevalue of diffReplacedFromBefore) {
@@ -90,10 +91,3 @@ export function mergeDiff(before: any, after: any) {
   }
   return before;
 }
-console.log(
-  "---------------------------------------------------------------------"
-);
-console.log("MERGE ACCENTPHRASES", mergeDiff(beforeAccents, afterAccents));
-console.log(
-  "---------------------------------------------------------------------"
-);
