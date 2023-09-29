@@ -28,12 +28,6 @@ export function mergeDiff(before: any, after: any) {
   const diffadded = diffed.filter((v) => v["op"] === "add");
   const diffremoved = diffed.filter((v) => v["op"] === "remove");
 
-  console.log("======= replace operation ========");
-  console.table(diffReplacedFromBefore);
-  console.log("======= add operation ========");
-  console.table(diffadded);
-  console.log("======= remove operation ========");
-  console.table(diffremoved);
   // 変更操作(挿入かつ削除)
   /*同じ文字で過去のデータが現在のデータに上書きされないようにしたい*/
   for (const beforevalue of diffReplacedFromBefore) {
