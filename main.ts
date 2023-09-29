@@ -1,10 +1,12 @@
 import { diff } from "https://esm.sh/just-diff@6.0.2";
 import ky from "https://esm.sh/ky";
-import toPath from "https://esm.sh/underscore/modules/toPath.js";
 
 export function getAccentPhrases(str: string) {
   const pushed = `http://localhost:50021/accent_phrases?text=${str}&speaker=1`;
-  return ky.post(pushed).json();
+  return ky
+    .post(pushed)
+    .json()
+    .catch((res) => console.error("VOICEVOXの起動が必須です"));
 }
 
 const beforeAccents = await getAccentPhrases("こんばんは");
