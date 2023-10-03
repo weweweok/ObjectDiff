@@ -74,7 +74,7 @@ export function mergeDiff(before: any, after: any) {
   // 挿入操作 (アクセントごと(句点の追加の場合)、モーラごと(同じ空間内での追加)に対応)
   for (const value of diffadded) {
     if (copiedBefore[Number(value.path[0])] === undefined)
-      before.push(value.value);
+      copiedBefore.push(value.value);
     else if (copiedBefore[Number(value.path[0])][value.path[1]] === undefined)
       copiedBefore[Number(value.path[0])][value.path[1]].push(value.value);
     else if (

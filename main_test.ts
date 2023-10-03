@@ -13,29 +13,60 @@ function getMoraText(AccentPhrases: any) {
   });
   return target;
 }
-// moraの文字がafterAccentsとmergeDiffで一致し、なおかつafterAccentsとmergeDiffのオブジェクトが一致していないと正しい
+
+async function comprehensiveTest(beforestring: string, afterstring: string) {
+  const beforeAccents = await getAccentPhrases(beforestring);
+  const afterAccents = await getAccentPhrases(afterstring);
+
+  // morasからmoras.textで構成される文字列を生成する
+  const afterMoras = pluck(JSON.parse(JSON.stringify(afterAccents)), "moras");
+
+  const mergeAccent = mergeDiff(beforeAccents, afterAccents);
+  // morasからmoras.textで構成される文字列を生成する
+  const mergeMoras = pluck(JSON.parse(JSON.stringify(mergeAccent)), "moras");
+
+  const AfterMorasText = getMoraText(afterMoras).join("");
+  const mergeMorasText = getMoraText(mergeMoras).join("");
+  if (AfterMorasText === mergeMorasText)
+    // マージ前のアクセントデータ(AfterAccent)とマージ後のアクセントデータを比較して
+    //一致していなければbeforeAccentも適用されていると解釈してテストに合格
+    assertNotEquals(
+      mergeAccent,
+      afterAccents,
+      "もし、文字列が変わっていない場合、このテストはエラーになります"
+    );
+  else {
+    assertEquals(mergeMorasText, AfterMorasText, "文字列が違います");
+  }
+}
 Deno.test(
-  "追加操作 (マージされたテストが正確に変更されているか検証しない)",
+  "変更操作 (マージされたアクセントが正確に変更されているか検証しない)",
   async () => {
-    const beforeAccents = await getAccentPhrases("こんばんは");
-    const afterAccents = await getAccentPhrases("こんにちは");
+    await comprehensiveTest("こんにちは", "こんばんは");
+    await comprehensiveTest(
+      "ディープラーニングは万能薬ではありません",
+      "機械学習は鎮痛剤ではありません"
+    );
+  }
+);
 
-    const afterMoras = pluck(JSON.parse(JSON.stringify(afterAccents)), "moras");
+Deno.test(
+  "追加操作 (マージされたアクセントが正確に変更されているか検証しない)",
+  async () => {
+    await comprehensiveTest("こんにちは", "こんにちは、ずんだもんです");
+    await comprehensiveTest(
+      "こんにちは",
+      "こんにちは、私はずんだもんではありません。桜田門です"
+    );
+  }
+);
 
-    const mergeAccent = mergeDiff(beforeAccents, afterAccents);
-    const mergeMoras = pluck(JSON.parse(JSON.stringify(mergeAccent)), "moras");
-
-    const morasText = getMoraText(afterMoras).join("");
-    const mergeMorasText = getMoraText(mergeMoras).join("");
-
-    if (morasText === mergeMorasText)
-      assertNotEquals(
-        mergeAccent,
-        afterAccents,
-        "もし、文字列が変わっていない場合、このテストはエラーになります"
-      );
-    else {
-      assertEquals(mergeMorasText, morasText, "文字列が違います");
-    }
+Deno.test(
+  "削除操作 (マージされたアクセントが正確に変更されているか検証しない)",
+  async () => {
+    await comprehensiveTest(
+      "こんにちは、ずんだもんです",
+      "こんにちは、ずんだです"
+    );
   }
 );
