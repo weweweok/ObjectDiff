@@ -1,5 +1,6 @@
 import { diff } from "https://esm.sh/just-diff@6.0.2";
 import ky from "https://esm.sh/ky";
+import { diffApply } from "https://esm.sh/v131/just-diff-apply@5.5.0/index.js";
 /**
  *VOICEVOX_ENGINEからアクセントデータを取得する関数
  */
@@ -13,12 +14,17 @@ export function getAccentPhrases(str: string) {
 
 /*
  *オブジェクトの追加、変更、削除をマージする関数
- * path[index],path[index+1]と順番にたどることで変更箇所に到達可能
- * こんにちは -> あに ではうごかない
+ *AccentPhreasesの階層構造は、浅い方から順に
+ *Array -> "moras" -> Array -> objectvalueの4層構造となっており、これらから適切に変更を適用する
  */
 export function mergeDiff(before: any, after: any) {
   const diffed = diff(before, after);
-
+  const othersDiff = diffed.filter(
+    (v) =>
+      v.path.includes("accent") ||
+      v.path.includes("pause_mora") ||
+      v.path.includes("is_interrogative")
+  );
   const diffRepacedFromAfter = diff(after, before).filter(
     (v) => v.op === "replace" && v.path.includes("text")
   );
@@ -28,27 +34,34 @@ export function mergeDiff(before: any, after: any) {
   const diffadded = diffed.filter((v) => v["op"] === "add");
   const diffremoved = diffed.filter((v) => v["op"] === "remove");
 
-  // 変更操作(挿入かつ削除)
-  const seen: boolean[][] = Array(100)
+  // 変更操作の際にすでに変更したモーラの場所を再利用しないために使う
+  const seenBeforeAccent: boolean[][] = Array(100)
     .fill(false)
     .map(() => Array(100).fill(false));
-
-  const seenAfter: boolean[][] = Array(100)
+  // 変更操作の際にすでに変更したモーラの場所を再利用しないために使う
+  const seenAfterAccent: boolean[][] = Array(100)
     .fill(false)
     .map(() => Array(100).fill(false));
 
   const copiedBefore = JSON.parse(JSON.stringify(before));
   const copiedAfter = JSON.parse(JSON.stringify(after));
 
+  // 変更操作 前後のアクセントで文字列が変わっている場合、変更前のアクセントデータにモーラデータごと代入する
   diffReplacedFromBefore.forEach((beforevalue) => {
     diffRepacedFromAfter.forEach((aftervalue) => {
       if (
-        !seen[Number(beforevalue.path[0])][Number(beforevalue.path[2])] &&
-        !seenAfter[Number(aftervalue.path[0])][Number(aftervalue.path[2])]
+        !seenBeforeAccent[Number(beforevalue.path[0])][
+          Number(beforevalue.path[2])
+        ] &&
+        !seenAfterAccent[Number(aftervalue.path[0])][Number(aftervalue.path[2])]
       ) {
-        seen[Number(beforevalue.path[0])][Number(beforevalue.path[2])] = true;
-        seenAfter[Number(aftervalue.path[0])][Number(aftervalue.path[2])] =
-          true;
+        seenBeforeAccent[Number(beforevalue.path[0])][
+          Number(beforevalue.path[2])
+        ] = true;
+        seenAfterAccent[Number(aftervalue.path[0])][
+          Number(aftervalue.path[2])
+        ] = true;
+
         copiedBefore[beforevalue.path[0]][beforevalue.path[1]][
           beforevalue.path[2]
         ] =
@@ -84,5 +97,7 @@ export function mergeDiff(before: any, after: any) {
       copiedBefore[Number(value.path[0])][value.path[1]][value.path[2]] =
         value.value;
   }
+  diffApply(copiedBefore, othersDiff);
+  console.log(othersDiff);
   return copiedBefore;
 }
