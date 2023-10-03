@@ -2,6 +2,7 @@ import { assertNotEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
 import { mergeDiff, getAccentPhrases } from "./main.ts";
 
 import pluck from "https://esm.sh/v132/just-pluck-it@2.3.0";
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/assert_equals.ts";
 
 function getMoraText(AccentPhrases: any) {
   const target: any[] = [];
@@ -16,12 +17,8 @@ function getMoraText(AccentPhrases: any) {
 Deno.test(
   "追加操作 (マージされたテストが正確に変更されているか検証しない)",
   async () => {
-    const beforeAccents = await getAccentPhrases(
-      "こんにちは、こんちには、おそようございます"
-    );
-    const afterAccents = await getAccentPhrases(
-      "こんにちは、こんばんは、おはようございます"
-    );
+    const beforeAccents = await getAccentPhrases("こんばんは");
+    const afterAccents = await getAccentPhrases("こんにちは");
 
     const afterMoras = pluck(JSON.parse(JSON.stringify(afterAccents)), "moras");
 
@@ -37,6 +34,8 @@ Deno.test(
         afterAccents,
         "もし、文字列が変わっていない場合、このテストはエラーになります"
       );
-    else console.error(morasText, mergeMorasText);
+    else {
+      assertEquals(mergeMorasText, morasText, "文字列が違います");
+    }
   }
 );

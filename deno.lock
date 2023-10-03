@@ -14,6 +14,7 @@
   "redirects": {
     "https://esm.sh/axios": "https://esm.sh/axios@1.5.1",
     "https://esm.sh/diff": "https://esm.sh/diff@5.1.0",
+    "https://esm.sh/just-diff-apply": "https://esm.sh/just-diff-apply@5.5.0",
     "https://esm.sh/just-has": "https://esm.sh/just-has@2.3.0",
     "https://esm.sh/just-pluck-it": "https://esm.sh/just-pluck-it@2.3.0",
     "https://esm.sh/just-values": "https://esm.sh/just-values@2.2.0",
