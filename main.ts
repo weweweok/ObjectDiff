@@ -98,6 +98,5 @@ export function mergeDiff(before: any, after: any) {
         value.value;
   }
   diffApply(copiedBefore, othersDiff);
-  console.log(othersDiff);
   return copiedBefore;
 }

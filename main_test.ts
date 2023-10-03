@@ -25,7 +25,7 @@ async function comprehensiveTest(beforestring: string, afterstring: string) {
   const mergeMoras = pluck(JSON.parse(JSON.stringify(mergeAccent)), "moras");
   const AfterMorasText = getMoraText(afterMoras).join("");
   const mergeMorasText = getMoraText(mergeMoras).join("");
-  if (AfterMorasText === mergeMorasText)
+  if (AfterMorasText === mergeMorasText && AfterMorasText === afterstring)
     // マージ前のアクセントデータ(AfterAccent)とマージ後のアクセントデータを比較して
     //一致していなければbeforeAccentも適用されていると解釈してテストに合格
     assertNotEquals(
