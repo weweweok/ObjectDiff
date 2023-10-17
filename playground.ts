@@ -1,12 +1,17 @@
 import { mergeDiff } from "./main.ts";
 import { getAccentPhrases } from "./main.ts";
+import { diff, jsonPatchPathConverter } from "https://esm.sh/just-diff@6.0.2";
+const beforeAccents = await getAccentPhrases("こんにちは、ずんだもんです");
+const afterAccents = await getAccentPhrases("こんにちは、ずんだです");
 
-const beforeAccents = await getAccentPhrases(
-  "この例文は、書き方のサンプルなので必要に応じて内容を追加削除をしてからお使いください。"
-);
-const afterAccents = await getAccentPhrases(
-  "この例文は、書き方の一例なので必要に応じて内容を追加削除をしてからお使いください。"
-);
+// console.log(beforeAccents[0].moras, afterAccents[0].moras);
+// console.log(mergeDiff(beforeAccents, afterAccents));
 
-console.log(afterAccents);
-console.log(mergeDiff(beforeAccents, afterAccents));
+// console.log(
+//   "=====================================================",
+//   mergeDiff(beforeAccents, afterAccents)
+// );
+console.log(JSON.stringify(afterAccents));
+const merged = mergeDiff(beforeAccents, afterAccents);
+
+console.log(JSON.stringify(merged));

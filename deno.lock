@@ -14,6 +14,7 @@
   "redirects": {
     "https://esm.sh/axios": "https://esm.sh/axios@1.5.1",
     "https://esm.sh/diff": "https://esm.sh/diff@5.1.0",
+    "https://esm.sh/jiff": "https://esm.sh/jiff@0.7.3",
     "https://esm.sh/just-diff-apply": "https://esm.sh/just-diff-apply@5.5.0",
     "https://esm.sh/just-has": "https://esm.sh/just-has@2.3.0",
     "https://esm.sh/just-pluck-it": "https://esm.sh/just-pluck-it@2.3.0",
@@ -21,7 +22,9 @@
     "https://esm.sh/ky": "https://esm.sh/ky@1.0.1",
     "https://esm.sh/lodash": "https://esm.sh/lodash@4.17.21",
     "https://esm.sh/underscore/modules/map.js": "https://esm.sh/underscore@1.13.6/modules/map.js",
-    "https://esm.sh/underscore/modules/toPath.js": "https://esm.sh/underscore@1.13.6/modules/toPath.js"
+    "https://esm.sh/underscore/modules/toPath.js": "https://esm.sh/underscore@1.13.6/modules/toPath.js",
+    "https://esm.sh/v131/jiff": "https://esm.sh/v131/jiff@0.7.3",
+    "https://esm.sh/v132/@types/diff@^5/index.d.ts": "https://esm.sh/v132/@types/diff@5.0.6/index.d.ts"
   },
   "remote": {
     "https://deno.land/std@0.150.0/media_types/_util.ts": "ce9b4fc4ba1c447dafab619055e20fd88236ca6bdd7834a21f98bd193c3fbfa1",
@@ -58,6 +61,7 @@
     "https://deno.land/x/xhr@0.3.0/mod.ts": "094aacd627fd9635cd942053bf8032b5223b909858fa9dc8ffa583752ff63b20",
     "https://esm.sh/axios@1.5.1": "f759532c2b2fd7a76b8a52a09a326c5f4f2bbfb5d3a9ae68b814175a7f0f1fdd",
     "https://esm.sh/diff@5.1.0": "d53ffb06a66e0eedc68895f48481ce6e10e71f81b455a1a9405a84145473b8dd",
+    "https://esm.sh/jiff@0.7.3": "c9ff52c859532d86e4c2ed634b26ffe23fc730bd8ff23c7ba72b2bec3be87e6a",
     "https://esm.sh/just-diff-apply@5.5.0": "c1cc00f9951d7fb3bac21b96192abc7dcc7389a77e8efe480fbc0de437848065",
     "https://esm.sh/just-diff@6.0.2": "8e01046e20078e017d3f4efe45515608194d71d3d3447b3952c345b29912cdbc",
     "https://esm.sh/just-has@2.3.0": "fb6194dce1d459ea58a4da7ac5de03ba50c36eb6576edcd500143199430e1ad7",
@@ -67,6 +71,8 @@
     "https://esm.sh/lodash@4.17.21": "eabface1a0847024e6e1cae61aed3d58914ed688aa5c8e6cf9ad5357729d0251",
     "https://esm.sh/underscore@1.13.6/modules/map.js": "d29b231ed5dbea84dcdbe415211d3a9c55a2e2644830e4e5449e981c00d6a67f",
     "https://esm.sh/underscore@1.13.6/modules/toPath.js": "c8710608618f4c97baefe921791fdd9447dd40d4271dd10c5795bcfdb7ac4af0",
+    "https://esm.sh/v131/jiff@0.7.3": "c9ff52c859532d86e4c2ed634b26ffe23fc730bd8ff23c7ba72b2bec3be87e6a",
+    "https://esm.sh/v131/jiff@0.7.3/denonext/jiff.mjs": "0cac24f821fa80077a032a7ffb3df0e32e66b8b3befbda147268d0c397ecf069",
     "https://esm.sh/v131/just-diff-apply@5.5.0/denonext/index.js": "33fdaa2ff4cb9a96f7f46d1dbb6a1607d27437ed3f187ad97af081fdc2d5a3a9",
     "https://esm.sh/v131/just-diff-apply@5.5.0/denonext/just-diff-apply.mjs": "9dfbdb2a7d3f0785f4c0298a93b7bc9cbc4d7f2f9b749df278a0c1bc87f31acf",
     "https://esm.sh/v131/just-diff-apply@5.5.0/index.js": "3c6addef4622c2b550bb4ee5203f1f1ba46c0e078af9e9741cf43455c601f95b",
@@ -77,7 +83,9 @@
     "https://esm.sh/v132/diff@5.1.0/denonext/diff.mjs": "6ae5d5b78a6219112183e9208fd39275349236dfe6d82066aa305d74e7ae38f1",
     "https://esm.sh/v132/just-has@2.3.0/denonext/just-has.mjs": "0c2b90c44fd6a3d32d1f212957e06e66573c5636c6710bedfcbbb21975d1e7ab",
     "https://esm.sh/v132/just-pluck-it@2.3.0": "311ece1453428100688189c85e1a1458f1457ed73e8823e224eaf20fa1e18df6",
+    "https://esm.sh/v132/just-pluck-it@2.3.0/denonext/index.js": "b7b11ef9d17ad534f4be88013104694e83f70b2ff587ad24503866bed469fd9a",
     "https://esm.sh/v132/just-pluck-it@2.3.0/denonext/just-pluck-it.mjs": "a73eeb93bd6034951cc29a4c4f543bc893f96cf0310dbeb06a867a12639ed12e",
+    "https://esm.sh/v132/just-pluck-it@2.3.0/index.js": "c49ebdf30e11a0e9c32f16f192e00386186386c879a264ebb6dcb1ced2088f80",
     "https://esm.sh/v132/just-values@2.2.0/denonext/just-values.mjs": "ef80dc146337a45cbaab8591e8be47863d8a9b6638f135ee48fa7806de770064",
     "https://esm.sh/v132/ky@1.0.1/denonext/ky.mjs": "0bdda1fae8fd0e9b9bd5b1d1f471a7bf9b6154dd6dbe3219c1a1b766c2838d8b",
     "https://esm.sh/v132/lodash@4.17.21/denonext/lodash.mjs": "03507ec58790b76db2d03270878c70b943b83099cdfdcad2b0fa8759abc61057",

@@ -1,6 +1,6 @@
-import { diff } from "https://esm.sh/just-diff@6.0.2";
 import ky from "https://esm.sh/ky";
-import { diffApply } from "https://esm.sh/v131/just-diff-apply@5.5.0/index.js";
+import pluck from "https://esm.sh/v132/just-pluck-it@2.3.0/index.js";
+import * as Diff from "https://esm.sh/diff@5.1.0";
 /**
  *VOICEVOX_ENGINEからアクセントデータを取得する関数
  */
@@ -12,91 +12,102 @@ export function getAccentPhrases(str: string) {
     .catch((res) => console.error("VOICEVOXの起動が必須です"));
 }
 
-/*
- *オブジェクトの追加、変更、削除をマージする関数
- *AccentPhreasesの階層構造は、浅い方から順に
- *Array -> "moras" -> Array -> objectvalueの4層構造となっており、これらから適切に変更を適用する
- */
-export function mergeDiff(before: any, after: any) {
-  const diffed = diff(before, after);
-  const othersDiff = diffed.filter(
-    (v) =>
-      v.path.includes("accent") ||
-      v.path.includes("pause_mora") ||
-      v.path.includes("is_interrogative")
-  );
-  const diffRepacedFromAfter = diff(after, before).filter(
-    (v) => v.op === "replace" && v.path.includes("text")
-  );
-  const diffReplacedFromBefore = diffed.filter(
-    (v) => v["op"] === "replace" && v.path.includes("text")
-  );
-  const diffadded = diffed.filter((v) => v["op"] === "add");
-  const diffremoved = diffed.filter((v) => v["op"] === "remove");
-
-  // 変更操作の際にすでに変更したモーラの場所を再利用しないために使う
-  const seenBeforeAccent: boolean[][] = Array(100)
-    .fill(false)
-    .map(() => Array(100).fill(false));
-  // 変更操作の際にすでに変更したモーラの場所を再利用しないために使う
-  const seenAfterAccent: boolean[][] = Array(100)
-    .fill(false)
-    .map(() => Array(100).fill(false));
-
-  const copiedBefore = JSON.parse(JSON.stringify(before));
-  const copiedAfter = JSON.parse(JSON.stringify(after));
-
-  // 変更操作 前後のアクセントで文字列が変わっている場合、変更前のアクセントデータにモーラデータごと代入する
-  diffReplacedFromBefore.forEach((beforevalue) => {
-    diffRepacedFromAfter.forEach((aftervalue) => {
-      if (
-        !seenBeforeAccent[Number(beforevalue.path[0])][
-          Number(beforevalue.path[2])
-        ] &&
-        !seenAfterAccent[Number(aftervalue.path[0])][Number(aftervalue.path[2])]
-      ) {
-        seenBeforeAccent[Number(beforevalue.path[0])][
-          Number(beforevalue.path[2])
-        ] = true;
-        seenAfterAccent[Number(aftervalue.path[0])][
-          Number(aftervalue.path[2])
-        ] = true;
-
-        copiedBefore[beforevalue.path[0]][beforevalue.path[1]][
-          beforevalue.path[2]
-        ] =
-          copiedAfter[aftervalue.path[0]][aftervalue.path[1]][
-            aftervalue.path[2]
-          ];
-      }
-    });
+function getMorasFromAccentPhrases(accent: any) {
+  const result: any[] = [];
+  accent.forEach((element: any, index: number) => {
+    const plucked = pluck(element.moras, "text");
+    const text = plucked.join("");
+    result.push(text);
+    if (accent[index + 1] !== undefined) result.push("/");
   });
+  return result;
+}
 
-  // 削除操作
-  for (const value of diffremoved) {
-    if (copiedBefore[Number(value.path[0])][value.path[1]] !== undefined) {
-      copiedBefore[Number(value.path[0])][value.path[1]].splice(
-        value.path[2],
-        1
-      );
-    } else if (copiedBefore[Number(value.path[0])] !== undefined) {
-      copiedBefore.splice(value.path[0], 1);
+interface DiffOperator {
+  count: number;
+  added?: boolean | undefined;
+  removed?: boolean | undefined;
+  value: string;
+}
+
+export function mergeDiff(beforeAccent: any, afterAccent: any) {
+  const after = JSON.parse(JSON.stringify(afterAccent));
+  const before = JSON.parse(JSON.stringify(beforeAccent));
+  const diffed: DiffOperator[] | any = Diff.diffChars(
+    getMorasFromAccentPhrases(before).join(""),
+    getMorasFromAccentPhrases(after).join("")
+  );
+  diffed.forEach((patch: DiffOperator) => {
+    for (const char of patch.value) {
+      if (char === "ャ" || char === "ュ" || char === "ョ" || char === "/") {
+        --patch.count;
+        if (char !== "/") patch.value.replace(char, "");
+      }
     }
+  });
+  console.log(diffed);
+  const plucked = pluck(before, "moras").flat();
+  console.log("now moving ...");
+  let afterCount1 = 0; // 最上階を表す
+  let afterCount2 = 0; // mora番号
+  while (plucked.length !== 0) {
+    if (after.length === afterCount1) {
+      break;
+    } else if (after[afterCount1]["moras"].length === afterCount2) {
+      ++afterCount1;
+      afterCount2 = 0;
+      continue;
+    }
+    if (diffed[0].added) {
+      for (const Char of diffed[0].value) {
+        if (Char === "/") {
+          break;
+        } else {
+          afterCount2++;
+        }
+      }
+      for (
+        let charCounter = 0;
+        charCounter < Number(diffed[0].count);
+        charCounter++
+      ) {
+        plucked.shift();
+      }
+      diffed.shift();
+      if (after[afterCount1]["moras"][afterCount2] === undefined) {
+        ++afterCount1;
+        afterCount2 = 0;
+      }
+      continue;
+    }
+
+    if (diffed[0].removed) {
+      for (const Char of diffed[0].value) {
+        if (Char === "/") {
+          ++afterCount1;
+          afterCount2 = 0;
+          break;
+        } else {
+          ++afterCount2;
+        }
+      }
+      for (let charCounter = 0; charCounter < diffed[0].count; charCounter++) {
+        plucked.shift();
+      }
+      diffed.shift();
+      if (after[afterCount1]["moras"][afterCount2] === undefined) {
+        ++afterCount1;
+        afterCount2 = 0;
+      }
+      continue;
+    }
+
+    if (after[afterCount1]["moras"][afterCount2].text === plucked[0].text)
+      after[afterCount1]["moras"][afterCount2] = plucked[0];
+
+    plucked.shift();
+    ++afterCount2;
   }
 
-  // 挿入操作 (アクセントごと(句点の追加の場合)、モーラごと(同じ空間内での追加)に対応)
-  for (const value of diffadded) {
-    if (copiedBefore[Number(value.path[0])] === undefined)
-      copiedBefore.push(value.value);
-    else if (copiedBefore[Number(value.path[0])][value.path[1]] === undefined)
-      copiedBefore[Number(value.path[0])][value.path[1]].push(value.value);
-    else if (
-      copiedBefore[Number(value.path[0])][value.path[1]][value.path[2]] ===
-      undefined
-    )
-      copiedBefore[Number(value.path[0])][value.path[1]][value.path[2]] =
-        value.value;
-  }
-  diffApply(copiedBefore, othersDiff);
-  return copiedBefore;
+  return after;
 }
