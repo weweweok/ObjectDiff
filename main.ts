@@ -18,7 +18,6 @@ function getMorasFromAccentPhrases(accent: any) {
     const plucked = pluck(element.moras, "text");
     const text = plucked.join("");
     result.push(text);
-    if (accent[index + 1] !== undefined) result.push("/");
   });
   return result;
 }
@@ -37,76 +36,76 @@ export function mergeDiff(beforeAccent: any, afterAccent: any) {
     getMorasFromAccentPhrases(before).join(""),
     getMorasFromAccentPhrases(after).join("")
   );
-  diffed.forEach((patch: DiffOperator) => {
-    for (const char of patch.value) {
-      if (char === "ャ" || char === "ュ" || char === "ョ" || char === "/") {
-        --patch.count;
-        if (char !== "/") patch.value.replace(char, "");
-      }
-    }
-  });
+
   console.log(diffed);
-  const plucked = pluck(before, "moras").flat();
-  console.log("now moving ...");
-  let afterCount1 = 0; // 最上階を表す
-  let afterCount2 = 0; // mora番号
-  while (plucked.length !== 0) {
-    if (after.length === afterCount1) {
-      break;
-    } else if (after[afterCount1]["moras"].length === afterCount2) {
-      ++afterCount1;
-      afterCount2 = 0;
-      continue;
-    }
-    if (diffed[0].added) {
-      for (const Char of diffed[0].value) {
-        if (Char === "/") {
-          break;
-        } else {
-          afterCount2++;
-        }
-      }
+  const pluckedBefore = pluck(before, "moras").flat();
+  const pluckedAfter = pluck(after, "moras").flat();
+  let pluckedIndex = 0;
+  for (const diff of diffed) {
+    if (diff.removed) {
+      let removesmallchar = 0;
       for (
-        let charCounter = 0;
-        charCounter < Number(diffed[0].count);
-        charCounter++
+        let removeValueIndex = 0;
+        removeValueIndex < diff.value.length;
+        removeValueIndex++
       ) {
-        plucked.shift();
-      }
-      diffed.shift();
-      if (after[afterCount1]["moras"][afterCount2] === undefined) {
-        ++afterCount1;
-        afterCount2 = 0;
-      }
-      continue;
-    }
-
-    if (diffed[0].removed) {
-      for (const Char of diffed[0].value) {
-        if (Char === "/") {
-          ++afterCount1;
-          afterCount2 = 0;
-          break;
-        } else {
-          ++afterCount2;
+        if (
+          diff.value[removeValueIndex] === "ャ" ||
+          diff.value[removeValueIndex] === "ュ" ||
+          diff.value[removeValueIndex] === "ョ"
+        ) {
+          ++removesmallchar;
         }
       }
-      for (let charCounter = 0; charCounter < diffed[0].count; charCounter++) {
-        plucked.shift();
+      pluckedBefore.splice(pluckedIndex - 1, diff.count - removesmallchar);
+      pluckedIndex += diff.count - removesmallchar;
+    } else if (diff.added) {
+      for (let valueIndex = 0; valueIndex < diff.value.length; valueIndex++) {
+        if (
+          diff.value[valueIndex + 1] === "ャ" ||
+          diff.value[valueIndex + 1] === "ュ" ||
+          diff.value[valueIndex + 1] === "ョ"
+        ) {
+          pluckedBefore.splice(
+            pluckedIndex,
+            0,
+            String(diff.value[valueIndex]) + String(diff.value[valueIndex + 1])
+          );
+          ++valueIndex;
+        } else {
+          pluckedBefore.splice(pluckedIndex, 0, diff.value[valueIndex]);
+        }
+        ++pluckedIndex;
       }
-      diffed.shift();
-      if (after[afterCount1]["moras"][afterCount2] === undefined) {
-        ++afterCount1;
-        afterCount2 = 0;
+    } else {
+      // 削除も変更もしないfor文を記述
+      for (const char of diff.value) {
+        if (char === "ャ" || char === "ュ" || char === "ョ") continue;
+        else ++pluckedIndex;
       }
-      continue;
     }
+  }
 
-    if (after[afterCount1]["moras"][afterCount2].text === plucked[0].text)
-      after[afterCount1]["moras"][afterCount2] = plucked[0];
-
-    plucked.shift();
-    ++afterCount2;
+  console.log(pluckedBefore);
+  let beforeIndex = 0;
+  for (let AccentIndex = 0; AccentIndex < after.length; AccentIndex++) {
+    for (
+      let MoraIndex = 0;
+      MoraIndex < after[AccentIndex]["moras"].length;
+      MoraIndex++
+    ) {
+      if (typeof pluckedBefore[beforeIndex] === "string") {
+        ++beforeIndex;
+        continue;
+      }
+      if (
+        after[AccentIndex]["moras"][MoraIndex].text ===
+        pluckedBefore[beforeIndex].text
+      ) {
+        after[AccentIndex]["moras"][MoraIndex] = pluckedBefore[beforeIndex];
+      }
+      ++beforeIndex;
+    }
   }
 
   return after;
