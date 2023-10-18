@@ -57,8 +57,7 @@ export function mergeDiff(beforeAccent: any, afterAccent: any) {
           ++removesmallchar;
         }
       }
-      pluckedBefore.splice(pluckedIndex - 1, diff.count - removesmallchar);
-      pluckedIndex += diff.count - removesmallchar;
+      pluckedBefore.splice(pluckedIndex, diff.count - removesmallchar);
     } else if (diff.added) {
       for (let valueIndex = 0; valueIndex < diff.value.length; valueIndex++) {
         if (
@@ -71,11 +70,11 @@ export function mergeDiff(beforeAccent: any, afterAccent: any) {
             0,
             String(diff.value[valueIndex]) + String(diff.value[valueIndex + 1])
           );
-          ++valueIndex;
+          pluckedIndex += 2;
         } else {
           pluckedBefore.splice(pluckedIndex, 0, diff.value[valueIndex]);
+          ++pluckedIndex;
         }
-        ++pluckedIndex;
       }
     } else {
       // 削除も変更もしないfor文を記述
@@ -85,8 +84,12 @@ export function mergeDiff(beforeAccent: any, afterAccent: any) {
       }
     }
   }
-
-  console.log(pluckedBefore);
+  const pluckstring = [];
+  for (const data of pluckedBefore) {
+    if (typeof data === "string") pluckstring.push(data);
+    else pluckstring.push(data.text);
+  }
+  console.log(pluckstring.join("") === pluck(pluckedAfter, "text").join(""));
   let beforeIndex = 0;
   for (let AccentIndex = 0; AccentIndex < after.length; AccentIndex++) {
     for (
