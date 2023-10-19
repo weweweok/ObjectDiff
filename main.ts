@@ -12,16 +12,6 @@ export function getAccentPhrases(str: string) {
     .catch((res) => console.error("VOICEVOXの起動が必須です"));
 }
 
-function getMorasFromAccentPhrases(accent: any) {
-  const result: any[] = [];
-  accent.forEach((element: any, index: number) => {
-    const plucked = pluck(element.moras, "text");
-    const text = plucked.join("");
-    result.push(text);
-  });
-  return result;
-}
-
 interface DiffOperator {
   count: number;
   added?: boolean | undefined;
@@ -32,55 +22,27 @@ interface DiffOperator {
 export function mergeDiff(beforeAccent: any, afterAccent: any) {
   const after = JSON.parse(JSON.stringify(afterAccent));
   const before = JSON.parse(JSON.stringify(beforeAccent));
-  const diffed: DiffOperator[] | any = Diff.diffChars(
-    getMorasFromAccentPhrases(before).join(""),
-    getMorasFromAccentPhrases(after).join("")
-  );
 
-  console.log(diffed);
   const pluckedBefore = pluck(before, "moras").flat();
   const pluckedAfter = pluck(after, "moras").flat();
+  const diffed = Diff.diffArrays(
+    pluck(JSON.parse(JSON.stringify(pluckedBefore)), "text"),
+    pluck(JSON.parse(JSON.stringify(pluckedAfter)), "text")
+  );
+  console.log(diffed);
   let pluckedIndex = 0;
   for (const diff of diffed) {
     if (diff.removed) {
-      let removesmallchar = 0;
-      for (
-        let removeValueIndex = 0;
-        removeValueIndex < diff.value.length;
-        removeValueIndex++
-      ) {
-        if (
-          diff.value[removeValueIndex] === "ャ" ||
-          diff.value[removeValueIndex] === "ュ" ||
-          diff.value[removeValueIndex] === "ョ"
-        ) {
-          ++removesmallchar;
-        }
-      }
-      pluckedBefore.splice(pluckedIndex, diff.count - removesmallchar);
+      pluckedBefore.splice(pluckedIndex, diff.count);
     } else if (diff.added) {
       for (let valueIndex = 0; valueIndex < diff.value.length; valueIndex++) {
-        if (
-          diff.value[valueIndex + 1] === "ャ" ||
-          diff.value[valueIndex + 1] === "ュ" ||
-          diff.value[valueIndex + 1] === "ョ"
-        ) {
-          pluckedBefore.splice(
-            pluckedIndex,
-            0,
-            String(diff.value[valueIndex]) + String(diff.value[valueIndex + 1])
-          );
-          pluckedIndex += 2;
-        } else {
-          pluckedBefore.splice(pluckedIndex, 0, diff.value[valueIndex]);
-          ++pluckedIndex;
-        }
+        pluckedBefore.splice(pluckedIndex, 0, diff.value[valueIndex]);
+        ++pluckedIndex;
       }
     } else {
       // 削除も変更もしないfor文を記述
       for (const char of diff.value) {
-        if (char === "ャ" || char === "ュ" || char === "ョ") continue;
-        else ++pluckedIndex;
+        ++pluckedIndex;
       }
     }
   }
